@@ -1,0 +1,35 @@
+# PantryLens
+
+PantryLens is a free AI-powered web application that generates recipes from photos of refrigerator or pantry contents.
+
+## What It Does
+
+Users photograph their available ingredients (up to 3 photos). The AI identifies the visible food items and produces a complete recipe using only those ingredients — including title, detected ingredient list, cooking steps, prep time, and serving size.
+
+## Key Facts
+
+- Free to use, no account required
+- Supports up to 3 photos per request
+- Powered by Google Gemma 4 via OpenRouter
+- Available as a Progressive Web App (installable on iOS and Android home screens)
+- Streams recipe output token-by-token for instant feedback
+- Designed to reduce food waste by cooking from what you already have
+
+## Primary Use Cases
+
+- Cooking with whatever is currently in the fridge
+- Using up leftovers before grocery shopping or travel
+- Meal planning from pantry staples and canned goods
+- Reducing food waste by finding recipes for items about to expire
+- Quick weeknight dinners when inspiration is lacking
+
+## Technology
+
+- Frontend: Next.js 16 PWA
+- AI Model: Google Gemma 4 (google/gemma-4-26b-a4b-it) via OpenRouter
+- Deployment: Vercel Edge Network (global low-latency)
+- Image processing: HTML5 Canvas API (client-side compression)
+
+## Privacy
+
+PantryLens does not store user photos or generated recipes. No account or personal data is required. Rate limiting is applied by IP address only.
