@@ -19,8 +19,10 @@ describe('ImageCapture', () => {
 
   it('disables both buttons when disabled prop is true', () => {
     render(<ImageCapture onFiles={onFiles} disabled={true} />);
-    expect(screen.getByRole('button', { name: /camera/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /upload/i })).toBeDisabled();
+    // Buttons are <label role="button"> elements; disabled state is signalled via
+    // aria-disabled (native `disabled` only applies to form controls).
+    expect(screen.getByRole('button', { name: /camera/i })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: /upload/i })).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('shows the max-images notice when disabled', () => {
