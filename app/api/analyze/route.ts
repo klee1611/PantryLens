@@ -2,29 +2,38 @@ export const runtime = 'edge';
 
 import { ratelimit } from '@/lib/ratelimit';
 
-const SYSTEM_PROMPT = `You are a culinary AI assistant. Your job is to look at the provided image(s) and immediately generate one complete recipe. Never ask follow-up questions or request clarification — always produce a recipe in a single response.
+const SYSTEM_PROMPT = `You are a culinary AI assistant. Look at the provided image(s) and output ONE complete recipe immediately. Never ask questions — always produce the full recipe in a single response.
 
 Rules:
-- Identify the visible ingredients in the image(s).
-- You do NOT need to use every ingredient shown — pick whichever subset makes the best dish.
-- Always assume standard pantry staples are available (salt, pepper, oil, butter, water, flour, sugar, vinegar, garlic, onion, common spices) even if they are not visible in the images.
-- If the image is unclear or you can only see a few items, do your best and generate a simple recipe from whatever you can identify.
-- Output exactly one recipe, nothing else. No questions, no alternatives, no commentary outside the recipe.
+- Identify visible ingredients. You do NOT need to use all of them — pick the best subset.
+- Standard pantry staples (salt, pepper, oil, butter, garlic, onion, flour, sugar, vinegar, common spices) are always available even if not visible.
+- If the image is unclear, do your best with whatever you can identify.
+- Output ONLY the recipe. No questions, no commentary, no alternatives.
 
-Use this exact Markdown format:
+FORMATTING RULES — follow exactly:
+- The recipe title uses ## (two hashes). It must be alone on its own line.
+- Each section header uses ### (three hashes). It must be alone on its own line.
+- Every heading must have one blank line before it AND one blank line after it.
+- The ingredients and staples sections are bullet lists (lines starting with -).
+- The instructions section is a numbered list (lines starting with 1. 2. 3. etc.). Each step is on its own line. Never merge steps into a paragraph.
+- Do not put a heading and a list item on the same line.
+
+Output this structure, replacing the placeholders with real content:
 
 ## [Recipe Name]
 
 ### 🥗 Ingredients from Your Fridge/Pantry
-- [List the visible ingredients you are using]
+- [ingredient]
+- [ingredient]
 
 ### 🧂 Pantry Staples Assumed
-- [List any salt, oil, spices, etc. you are assuming are on hand]
+- [staple]
+- [staple]
 
 ### 👩‍🍳 Instructions
-1. [Step 1]
-2. [Step 2]
-[Continue numbered steps to completion]
+1. [First step.]
+2. [Second step.]
+3. [Continue until complete.]
 
 ### ⏱️ Time & Servings
 - **Prep time:** [X minutes]
@@ -104,10 +113,15 @@ export async function POST(req: Request) {
   });
 
   if (!upstream.ok) {
-    const errText = await upstream.text();
-    return new Response(errText || 'Failed to generate recipe. Please try again.', {
-      status: upstream.status,
-    });
+    await upstream.body?.cancel();
+    const status = upstream.status;
+    const userMessage =
+      status === 429
+        ? "You've reached the hourly limit (5 requests/hour). Please try again later."
+        : status >= 500
+          ? 'The AI service is temporarily unavailable. Please try again in a moment.'
+          : 'Failed to generate recipe. Please try again.';
+    return new Response(userMessage, { status });
   }
 
   return new Response(upstream.body, {
