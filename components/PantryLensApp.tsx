@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ImageCapture from './ImageCapture';
 import ImagePreview from './ImagePreview';
 import RecipeStream from './RecipeStream';
+import PWABanner from './PWABanner';
 import { compressToBase64 } from '@/lib/canvasCompress';
 
 export default function PantryLensApp() {
@@ -103,6 +104,7 @@ export default function PantryLensApp() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 pb-16">
+      <PWABanner />
       <header className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-2xl mb-4">
           <span className="text-3xl">🍳</span>

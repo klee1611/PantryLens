@@ -125,9 +125,37 @@ export default function HomeContent() {
         </div>
       </section>
 
-      <footer className="mt-12 text-center text-stone-400 text-xs pb-4 space-y-1">
+      <footer className="mt-12 text-center text-stone-400 text-xs pb-4 space-y-3">
         <p className="font-medium">PantryLens — AI Recipe Generator from Fridge Photos</p>
         <p>Free to use · No account required · Works on any device</p>
+
+        {/* Hackathon badge */}
+        <div>
+          <a
+            href="https://dev.to/challenges/google-gemma-2026-05-06"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-3 py-1.5 text-xs text-stone-600 hover:border-amber-300 hover:text-amber-700 transition-colors shadow-sm"
+          >
+            <span aria-hidden="true">🏆</span>
+            Built for the Google Gemma 4 Hackathon on DEV
+          </a>
+        </div>
+
+        {/* Buy Me a Coffee */}
+        <div>
+          <a
+            href="https://www.buymeacoffee.com/klee1611"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#FFDD00] text-stone-900 font-semibold rounded-full px-4 py-2 text-xs hover:bg-yellow-300 transition-colors shadow-sm"
+          >
+            <span aria-hidden="true">☕</span>
+            Buy me a coffee
+          </a>
+        </div>
+
+        <p className="pt-1">© 2026 Kuo-Hsiu (Kourtney) Lee. All rights reserved.</p>
       </footer>
     </div>
   );
