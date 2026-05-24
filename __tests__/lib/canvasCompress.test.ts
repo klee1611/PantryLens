@@ -1,6 +1,5 @@
 import { compressToBase64 } from '@/lib/canvasCompress';
 
-// Keep a reference to the real createElement before spying
 const originalCreateElement = document.createElement.bind(document);
 
 function buildCanvasMock({
@@ -13,7 +12,7 @@ function buildCanvasMock({
     _h: 0,
     getContext: jest.fn(() => ctx),
     toBlob: jest.fn((cb: (b: Blob | null) => void) =>
-      cb(blobNull ? null : new Blob(['x'], { type: 'image/jpeg' }))
+      cb(blobNull ? null : new Blob(['x'], { type: 'image/jpeg' })),
     ),
   };
   Object.defineProperty(canvas, 'width', {
@@ -29,26 +28,34 @@ function buildCanvasMock({
   return canvas;
 }
 
+/**
+ * New flow (iOS-safe):
+ *   FileReader #1  readAsDataURL(file)  → onload({ target: { result: dataUrl } })
+ *   Image           src = dataUrl        → onload()
+ *   canvas.toBlob                        → blob
+ *   FileReader #2  readAsDataURL(blob)  → onloadend, .result = base64Result
+ */
 function setupMocks({
   imgWidth = 800,
   imgHeight = 600,
-  loadError = false,
+  fileReaderError = false,  // FileReader #1 (reading the source file) errors
+  loadError = false,         // Image fails to decode
   ctxNull = false,
   blobNull = false,
-  readerError = false,
+  outReaderError = false,   // FileReader #2 (reading the compressed blob) errors
   base64Result = 'data:image/jpeg;base64,MOCKEDBASE64',
+  dataUrl = 'data:image/jpeg;base64,SOURCEDATA',
 }: {
   imgWidth?: number;
   imgHeight?: number;
+  fileReaderError?: boolean;
   loadError?: boolean;
   ctxNull?: boolean;
   blobNull?: boolean;
-  readerError?: boolean;
+  outReaderError?: boolean;
   base64Result?: string;
+  dataUrl?: string;
 } = {}) {
-  URL.createObjectURL = jest.fn(() => 'blob:fake-url');
-  URL.revokeObjectURL = jest.fn();
-
   // Image mock: triggers onload/onerror when src is set
   global.Image = jest.fn(() => {
     const img: Record<string, unknown> = {
@@ -74,20 +81,38 @@ function setupMocks({
   jest.spyOn(document, 'createElement').mockImplementation((tag: string) =>
     tag === 'canvas'
       ? (mockCanvas as unknown as HTMLElement)
-      : originalCreateElement(tag)
+      : originalCreateElement(tag),
   );
 
-  // FileReader mock
+  // FileReader mock: two instances created per compressToBase64 call.
+  // #1 fires onload (source file → dataUrl), #2 fires onloadend (blob → base64).
+  let callCount = 0;
   global.FileReader = jest.fn(() => {
+    callCount++;
+    const isFirst = callCount === 1;
     const fr: Record<string, unknown> = {
-      result: base64Result,
+      result: isFirst ? dataUrl : base64Result,
+      onload: null,
       onloadend: null,
       onerror: null,
     };
     fr.readAsDataURL = jest.fn(() => {
       setTimeout(() => {
-        if (readerError) (fr.onerror as (() => void) | null)?.();
-        else (fr.onloadend as (() => void) | null)?.();
+        if (isFirst) {
+          if (fileReaderError) {
+            (fr.onerror as (() => void) | null)?.();
+          } else {
+            (fr.onload as ((e: { target: { result: string } }) => void) | null)?.({
+              target: { result: dataUrl },
+            });
+          }
+        } else {
+          if (outReaderError) {
+            (fr.onerror as (() => void) | null)?.();
+          } else {
+            (fr.onloadend as (() => void) | null)?.();
+          }
+        }
       }, 0);
     });
     return fr;
@@ -141,13 +166,6 @@ describe('compressToBase64', () => {
     expect(mockCanvas._h).toBe(1024);
   });
 
-  it('revokes the object URL after the image loads', async () => {
-    setupMocks();
-    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
-    await compressToBase64(file);
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
-  });
-
   it('calls drawImage with the correct canvas dimensions', async () => {
     const { mockCanvas } = setupMocks({ imgWidth: 2048, imgHeight: 1024 });
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
@@ -156,16 +174,30 @@ describe('compressToBase64', () => {
     expect(ctx.drawImage).toHaveBeenCalledWith(expect.anything(), 0, 0, 1024, 512);
   });
 
+  it('uses FileReader to read the source file (iOS-safe path)', async () => {
+    setupMocks();
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    await compressToBase64(file);
+    // FileReader should have been instantiated at least once (for the source file)
+    expect(global.FileReader).toHaveBeenCalled();
+  });
+
+  it('rejects when the initial file read fails', async () => {
+    setupMocks({ fileReaderError: true });
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    await expect(compressToBase64(file)).rejects.toThrow('Failed to read file');
+  });
+
+  it('rejects when the image fails to decode', async () => {
+    setupMocks({ loadError: true });
+    const file = new File(['content'], 'broken.jpg', { type: 'image/jpeg' });
+    await expect(compressToBase64(file)).rejects.toThrow('Failed to decode image');
+  });
+
   it('rejects when the canvas 2D context is unavailable', async () => {
     setupMocks({ ctxNull: true });
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
     await expect(compressToBase64(file)).rejects.toThrow('Canvas 2D context not available');
-  });
-
-  it('rejects when the image fails to load', async () => {
-    setupMocks({ loadError: true });
-    const file = new File(['content'], 'broken.jpg', { type: 'image/jpeg' });
-    await expect(compressToBase64(file)).rejects.toThrow('Failed to load image');
   });
 
   it('rejects when canvas.toBlob returns null', async () => {
@@ -174,9 +206,9 @@ describe('compressToBase64', () => {
     await expect(compressToBase64(file)).rejects.toThrow('Image compression failed');
   });
 
-  it('rejects when FileReader errors', async () => {
-    setupMocks({ readerError: true });
+  it('rejects when the output FileReader errors', async () => {
+    setupMocks({ outReaderError: true });
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
-    await expect(compressToBase64(file)).rejects.toThrow('Failed to read compressed image');
+    await expect(compressToBase64(file)).rejects.toThrow('Failed to encode result');
   });
 });

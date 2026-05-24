@@ -24,23 +24,36 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
     if (files.length) onFiles(files);
   };
 
-  const btnClass = [
-    'flex-1 py-2.5 px-4 border border-amber-200 rounded-xl text-amber-700 font-medium',
-    'text-sm hover:bg-amber-50 active:bg-amber-100 transition-colors',
-    'flex items-center justify-center',
-    disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'cursor-pointer',
-  ].join(' ');
+  /*
+   * Why this pattern instead of useRef + programmatic .click():
+   *   - iOS Safari blocks .click() on hidden/sr-only inputs (untrusted event)
+   *   - label→input with htmlFor creates two ARIA "button" nodes (the label
+   *     AND the input itself), breaking strict-mode accessibility queries
+   *
+   * Solution: each label wraps its own transparent full-overlay input.
+   *   - The input covers the entire label area (absolute inset-0, full w/h)
+   *   - opacity-0 makes it invisible; the label text shows through
+   *   - Tapping anywhere on the label taps the input directly — trusted event
+   *   - aria-hidden + tabIndex=-1 removes the input from the ARIA tree so
+   *     only the label's role="button" is visible to assistive tech
+   */
+  const fileInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input
+      type="file"
+      accept="image/*"
+      disabled={disabled}
+      onChange={handleChange}
+      aria-hidden="true"
+      tabIndex={-1}
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+      {...props}
+    />
+  );
 
   return (
     <div>
-      {/*
-       * Drop zone — also acts as a tap-to-browse-gallery trigger on mobile.
-       * Using <label htmlFor> instead of a div + programmatic .click() because
-       * iOS Safari silently drops .click() calls on display:none inputs.
-       * A label→input association is a native trusted activation on all platforms.
-       */}
+      {/* Drop zone — tap to browse on mobile, drag-and-drop on desktop */}
       <label
-        htmlFor="pl-gallery"
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
@@ -48,36 +61,51 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
         onDragOver={(e) => { e.preventDefault(); if (!disabled) setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         className={[
-          'border-2 border-dashed rounded-xl p-8 text-center transition-all select-none block',
+          'relative block border-2 border-dashed rounded-xl p-8',
+          'text-center transition-all select-none overflow-hidden',
           isDragging && !disabled
             ? 'border-amber-400 bg-amber-50'
             : 'border-stone-200 hover:border-amber-300 hover:bg-amber-50/50',
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         ].join(' ')}
       >
+        {fileInput({ multiple: true })}
         <div className="text-4xl mb-2">📸</div>
         <p className="text-stone-500 font-medium">Drop photos here</p>
         <p className="text-stone-400 text-sm mt-1">or use the buttons below</p>
       </label>
 
       <div className="flex gap-3 mt-3">
-        {/* Camera — label activates the capture input natively, no JS needed */}
         <label
-          htmlFor="pl-camera"
           role="button"
           aria-disabled={disabled || undefined}
-          className={btnClass}
+          className={[
+            'relative flex-1 py-2.5 px-4 border border-amber-200 rounded-xl overflow-hidden',
+            'text-amber-700 font-medium text-sm transition-colors',
+            'flex items-center justify-center',
+            disabled
+              ? 'opacity-40 cursor-not-allowed'
+              : 'hover:bg-amber-50 active:bg-amber-100 cursor-pointer',
+          ].join(' ')}
         >
+          {/* capture="environment" opens rear camera directly on iOS/Android */}
+          {fileInput({ capture: 'environment' })}
           📷 Camera
         </label>
 
-        {/* Gallery / file picker */}
         <label
-          htmlFor="pl-gallery"
           role="button"
           aria-disabled={disabled || undefined}
-          className={btnClass}
+          className={[
+            'relative flex-1 py-2.5 px-4 border border-amber-200 rounded-xl overflow-hidden',
+            'text-amber-700 font-medium text-sm transition-colors',
+            'flex items-center justify-center',
+            disabled
+              ? 'opacity-40 cursor-not-allowed'
+              : 'hover:bg-amber-50 active:bg-amber-100 cursor-pointer',
+          ].join(' ')}
         >
+          {fileInput({ multiple: true })}
           📁 Upload
         </label>
       </div>
@@ -85,30 +113,6 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
       {disabled && (
         <p className="text-center text-stone-400 text-xs mt-2">Maximum 3 images added</p>
       )}
-
-      {/*
-       * Inputs are sr-only (not display:none).
-       * On camera: no `multiple` — iOS ignores it when `capture` is set anyway.
-       * On gallery: `multiple` allows picking several photos at once.
-       */}
-      <input
-        id="pl-camera"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        disabled={disabled}
-        className="sr-only"
-        onChange={handleChange}
-      />
-      <input
-        id="pl-gallery"
-        type="file"
-        accept="image/*"
-        multiple
-        disabled={disabled}
-        className="sr-only"
-        onChange={handleChange}
-      />
     </div>
   );
 }

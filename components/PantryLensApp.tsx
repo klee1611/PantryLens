@@ -20,16 +20,25 @@ export default function PantryLensApp() {
       .filter((f) => f.type.startsWith('image/'))
       .slice(0, remaining);
 
+    if (toProcess.length === 0) return;
+
     const newImages: string[] = [];
+    let anyFailed = false;
     for (const file of toProcess) {
       try {
         newImages.push(await compressToBase64(file));
       } catch (err) {
         console.error('Compression failed:', err);
+        anyFailed = true;
       }
     }
 
-    if (newImages.length) setImages((prev) => [...prev, ...newImages]);
+    if (newImages.length) {
+      setImages((prev) => [...prev, ...newImages]);
+      setError('');
+    } else if (anyFailed) {
+      setError('Could not process that photo. Try a different image or format.');
+    }
   };
 
   const removeImage = (idx: number) => {
@@ -56,10 +65,10 @@ export default function PantryLensApp() {
       });
 
       if (res.status === 429) {
-        throw new Error("You've reached the hourly limit. Please try again later.");
+        throw new Error("You've reached the hourly limit (5 requests/hour). Please try again later.");
       }
       if (!res.ok) {
-        throw new Error((await res.text()) || 'Failed to generate recipe. Please try again.');
+        throw new Error('Failed to generate recipe. Please try again.');
       }
 
       const reader = res.body!.getReader();

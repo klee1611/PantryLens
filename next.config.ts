@@ -23,7 +23,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval'",  // 'unsafe-eval' needed by Next.js dev HMR; tighten in prod
+      // Next.js App Router injects inline <script> tags for RSC hydration payloads.
+    // 'unsafe-inline' is required or those scripts are blocked and React cannot hydrate.
+    // 'unsafe-eval' is required by Next.js dev-mode HMR source maps.
+    // Production hardening: replace both with per-request nonces via Next.js middleware.
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",       // blob: for Canvas-compressed previews
       "font-src 'self'",
@@ -48,6 +52,13 @@ const nextConfig: NextConfig = {
 
   // Strip X-Powered-By header
   poweredByHeader: false,
+
+  // Allow the dev server to serve cross-origin requests from other devices on the
+  // local network (e.g. iPhone on the same WiFi). Set DEV_ORIGINS in .env.local —
+  // never commit real IPs here. Has no effect in production builds.
+  ...(process.env.DEV_ORIGINS
+    ? { allowedDevOrigins: process.env.DEV_ORIGINS.split(',').map((s) => s.trim()) }
+    : {}),
 };
 
 export default nextConfig;
