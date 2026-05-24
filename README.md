@@ -2,7 +2,7 @@
 
 > Snap a photo of your fridge or pantry — get a recipe in seconds.
 
-PantryLens is a progressive web app (PWA) that uses AI vision to identify ingredients from photos and stream a complete recipe directly to the screen, token by token.
+PantryLens is a progressive web app (PWA) that uses AI vision (Google Gemma 4) to identify ingredients from photos and stream a complete recipe directly to the screen, token by token.
 
 ---
 
@@ -12,6 +12,12 @@ PantryLens is a progressive web app (PWA) that uses AI vision to identify ingred
 2. **Compress** — the browser Canvas API resizes each image client-side to ≤1024 px before upload
 3. **Analyze** — a Next.js Edge Function proxies the images to OpenRouter's vision model
 4. **Stream** — the recipe streams back token-by-token, rendered progressively as Markdown
+
+---
+
+## Demo
+
+<video src="assets/demo.mp4" width="360" controls></video>
 
 ---
 
@@ -73,23 +79,56 @@ npm start        # serve production build
 ## Architecture
 
 ```
-Browser
-  └─ Canvas API          compress image → ≤1024px JPEG @ 75% quality
-  └─ POST /api/analyze   { images: string[] }  ← Base64 array, no API key
-
-Edge Function (Vercel)
-  └─ IP rate limit       Upstash Redis sliding window
-  └─ Payload size check  4 MB body / 2 MB per image hard caps
-  └─ Inject secrets      Authorization header + system prompt (server-only)
-  └─ fetch() OpenRouter  stream: true
-  └─ Pipe SSE stream     text/event-stream → browser
-
-Browser
-  └─ ReadableStream      decode SSE chunks
-  └─ react-markdown      render Markdown progressively
+┌─────────────────────────────────────────────────────────────────┐
+│  Browser (PWA)                                                  │
+│                                                                 │
+│  Camera / File Input                                            │
+│       │                                                         │
+│       ▼                                                         │
+│  Canvas API  ──  resize to ≤1024 px, JPEG 75%  ──  Base64      │
+│       │                                                         │
+│       ▼                                                         │
+│  POST /api/analyze  { images: string[] }                        │
+│  (no API key, no system prompt — opaque to the frontend)        │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ HTTPS
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Vercel Edge Function  (Next.js Edge Runtime)                   │
+│                                                                 │
+│  1. IP rate limit     ──  Upstash Redis sliding window          │
+│                           5 requests / IP / hour                │
+│  2. Payload guard     ──  4 MB body cap, 2 MB per image         │
+│  3. Inject secrets    ──  Authorization: Bearer $OPENROUTER_KEY │
+│                           System prompt (never sent to client)  │
+│  4. Forward to        ──  OpenRouter API  (stream: true)        │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ HTTPS  (OpenAI-compatible SSE)
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  OpenRouter  (openrouter.ai)                                    │
+│                                                                 │
+│  Model routing layer — receives the request and dispatches it   │
+│  to the underlying Google Gemma 4 model endpoint.               │
+│                                                                 │
+│  Model: google/gemma-4-26b-a4b-it                               │
+│  ├─ Vision input    ──  decodes the Base64 images               │
+│  ├─ Ingredient scan ──  identifies visible food items           │
+│  └─ Recipe output   ──  streams Markdown tokens back via SSE    │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ SSE token stream piped back
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Browser (PWA)                                                  │
+│                                                                 │
+│  ReadableStream  ──  decode SSE chunks line by line             │
+│  react-markdown  ──  render Markdown progressively, live        │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-The API route is an **opaque proxy** — the frontend never sees the API key or the system prompt. Both are injected exclusively inside the Edge Function.
+**Why OpenRouter?** OpenRouter is a unified API gateway that provides access to Google's Gemma 4 model (`google/gemma-4-26b-a4b-it`) with a single OpenAI-compatible endpoint. It handles model routing, load balancing, and billing — so the Edge Function only needs one `Authorization` header regardless of which model is in use. Swapping models is a one-line env var change (`OPENROUTER_MODEL`).
+
+The `/api/analyze` route is an **opaque proxy** — the frontend never sees the OpenRouter API key or the system prompt. Both are injected exclusively inside the Edge Function.
 
 ---
 
@@ -109,33 +148,12 @@ The API route is an **opaque proxy** — the frontend never sees the API key or 
 ## Testing
 
 ```bash
-npm test                # run all unit tests (69 tests)
+npm test                # run all unit tests (70 tests)
 npm run test:coverage   # with coverage report
 npm run test:watch      # watch mode
 ```
 
-### Test coverage
-
-| Suite | Tests | What's covered |
-|-------|-------|----------------|
-| `__tests__/api/analyze.test.ts` | 17 | Input validation, opaque proxy security, streaming passthrough, rate limiting |
-| `__tests__/components/PantryLensApp.test.tsx` | 13 | Full interaction flow, streaming, error states |
-| `__tests__/components/ImageCapture.test.tsx` | 8 | Drop zone, file/camera inputs, disabled states |
-| `__tests__/components/ImagePreview.test.tsx` | 6 | Thumbnails, remove callback, empty state |
-| `__tests__/components/RecipeStream.test.tsx` | 9 | Loading, streaming, done, and idle states |
-| `__tests__/lib/canvasCompress.test.ts` | 16 | Resize logic, Base64 output, error handling |
-
 ---
-
-## Deployment
-
-### Vercel (recommended)
-
-```bash
-npx vercel --prod
-```
-
-Set the same environment variables from `.env.local` in the Vercel project settings. The Edge Runtime and streaming work out of the box.
 
 ### Environment variables required in production
 
