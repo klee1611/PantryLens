@@ -17,7 +17,12 @@ PantryLens is a progressive web app (PWA) that uses AI vision (Google Gemma 4) t
 
 ## Demo
 
-<video src="assets/demo.mp4" width="360" controls></video>
+https://github.com/user-attachments/assets/a5f55dd9-fd8d-4ddb-a76a-7f628b4096ac
+
+### Pin PWA to mobile home screen
+<img width="282" height="609" alt="PWA-1" src="https://github.com/user-attachments/assets/439a48f1-59ac-45de-ad50-34de45d8967d" />
+<img width="282" height="609" alt="PWA-2" src="https://github.com/user-attachments/assets/29cdecad-88a0-4024-bc4c-c122a01be94a" />
+
 
 ---
 
@@ -200,3 +205,16 @@ PantryLens is installable as a home screen app on iOS and Android. The manifest 
 ## License
 
 MIT
+
+---
+
+## ☕ Support This Project
+
+If you find this project helpful, consider supporting its development:
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/klee1611)
+
+Or visit: https://www.buymeacoffee.com/klee1611
+
+Happy coding! 🚀
+
