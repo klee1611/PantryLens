@@ -10,6 +10,7 @@ export default function ImagePreview({ images, onRemove }: Props) {
     <div className="flex gap-3 flex-wrap">
       {images.map((b64, i) => (
         <div key={i} className="relative group">
+          {/* eslint-disable-next-line @next/next/no-img-element -- data: URLs are not supported by next/image */}
           <img
             src={`data:image/jpeg;base64,${b64}`}
             alt={`Ingredient photo ${i + 1}`}
