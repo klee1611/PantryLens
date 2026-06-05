@@ -2,6 +2,7 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useLocale } from '@/lib/i18n';
 
 interface Props {
   content: string;
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function RecipeStream({ content, loading }: Props) {
+  const { t } = useLocale();
+
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
       {loading && !content && (
@@ -18,7 +21,7 @@ export default function RecipeStream({ content, loading }: Props) {
             <span className="w-2 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:150ms]" />
             <span className="w-2 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:300ms]" />
           </div>
-          <span className="text-sm">Analyzing your ingredients...</span>
+          <span className="text-sm">{t.recipe.analyzing}</span>
         </div>
       )}
 

@@ -2,7 +2,26 @@ export const runtime = 'edge';
 
 import { ratelimit } from '@/lib/ratelimit';
 
-const SYSTEM_PROMPT = `You are a culinary AI assistant. Look at the provided image(s) and output ONE complete recipe immediately. Never ask questions — always produce the full recipe in a single response.
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English',
+  'zh-TW': 'Traditional Chinese (繁體中文)',
+  ja: 'Japanese (日本語)',
+  fr: 'French (Français)',
+};
+
+const ALLOWED_LOCALES = new Set(Object.keys(LANGUAGE_NAMES));
+
+// Standard Base64 charset — rejects any non-Base64 payload before forwarding to upstream
+const BASE64_RE = /^[A-Za-z0-9+/]+=*$/;
+
+function buildSystemPrompt(locale: string): string {
+  const language = LANGUAGE_NAMES[locale] ?? LANGUAGE_NAMES.en;
+  const languageInstruction =
+    locale === 'en'
+      ? ''
+      : `\nLANGUAGE: Respond entirely in ${language}. Every word — recipe title, section headers, ingredient names, instructions, and time/servings — must be written in ${language}. Do not mix in English.`;
+
+  return `You are a culinary AI assistant. Look at the provided image(s) and output ONE complete recipe immediately. Never ask questions — always produce the full recipe in a single response.
 
 Rules:
 - Identify visible ingredients. You do NOT need to use all of them — pick the best subset.
@@ -38,7 +57,8 @@ Output this structure, replacing the placeholders with real content:
 ### ⏱️ Time & Servings
 - **Prep time:** [X minutes]
 - **Cook time:** [X minutes]
-- **Serves:** [X people]`;
+- **Serves:** [X people]${languageInstruction}`;
+}
 
 // 4 MB is generous for 3 × Canvas-compressed images (~200 KB each after Base64 overhead)
 const MAX_BODY_BYTES = 4 * 1024 * 1024;
@@ -64,7 +84,7 @@ export async function POST(req: Request) {
     return new Response('Request body too large.', { status: 413 });
   }
 
-  let body: { images: string[] };
+  let body: { images: string[]; locale?: string };
   try {
     const raw = await req.text();
     if (raw.length > MAX_BODY_BYTES) {
@@ -75,14 +95,21 @@ export async function POST(req: Request) {
     return new Response('Invalid request body.', { status: 400 });
   }
 
+  // Whitelist locale to prevent prompt injection via unsanitised user input
+  const rawLocale = typeof body.locale === 'string' ? body.locale : 'en';
+  const locale = ALLOWED_LOCALES.has(rawLocale) ? rawLocale : 'en';
+
   const { images } = body;
   if (!Array.isArray(images) || images.length === 0 || images.length > 3) {
     return new Response('Please provide between 1 and 3 images.', { status: 400 });
   }
 
-  // Validate each image string doesn't exceed the per-image cap
+  // Validate each image string: size cap + Base64 charset (rejects non-image payloads)
   if (images.some((img) => typeof img !== 'string' || img.length > MAX_IMAGE_B64_LENGTH)) {
     return new Response('One or more images exceed the size limit.', { status: 413 });
+  }
+  if (images.some((img) => !BASE64_RE.test(img))) {
+    return new Response('Invalid image data.', { status: 400 });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,7 +133,7 @@ export async function POST(req: Request) {
       model: process.env.OPENROUTER_MODEL ?? 'google/gemma-4-26b-a4b-it',
       stream: true,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: buildSystemPrompt(locale) },
         { role: 'user', content: userContent },
       ],
     }),
@@ -114,14 +141,15 @@ export async function POST(req: Request) {
 
   if (!upstream.ok) {
     await upstream.body?.cancel();
-    const status = upstream.status;
-    const userMessage =
-      status === 429
-        ? "You've reached the hourly limit (5 requests/hour). Please try again later."
-        : status >= 500
-          ? 'The AI service is temporarily unavailable. Please try again in a moment.'
-          : 'Failed to generate recipe. Please try again.';
-    return new Response(userMessage, { status });
+    // Only surface rate-limit status to the client; collapse everything else to 502
+    // to avoid leaking upstream API key validity (401), billing state (402), etc.
+    if (upstream.status === 429) {
+      return new Response("You've reached the hourly limit (5 requests/hour). Please try again later.", { status: 429 });
+    }
+    const userMessage = upstream.status >= 500
+      ? 'The AI service is temporarily unavailable. Please try again in a moment.'
+      : 'Failed to generate recipe. Please try again.';
+    return new Response(userMessage, { status: 502 });
   }
 
   return new Response(upstream.body, {

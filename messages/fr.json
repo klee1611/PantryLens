@@ -1,0 +1,74 @@
+{
+  "app": {
+    "tagline": "Photographiez votre frigo. Obtenez une recette.",
+    "clearAll": "Tout effacer",
+    "generating": "Préparation de votre recette...",
+    "generateBtn": "✨ Générer une recette",
+    "errRateLimit": "Vous avez atteint la limite horaire (5 requêtes/heure). Veuillez réessayer plus tard.",
+    "errFailed": "Échec de la génération de la recette. Veuillez réessayer.",
+    "errPhoto": "Impossible de traiter cette photo. Essayez une autre image ou format.",
+    "errGeneric": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "capture": {
+    "dropHere": "Déposez vos photos ici",
+    "orButtons": "ou utilisez les boutons ci-dessous",
+    "camera": "📷 Caméra",
+    "upload": "📁 Importer",
+    "maxReached": "Maximum 3 images ajoutées"
+  },
+  "preview": {
+    "altText": "Photo d'ingrédient {n}",
+    "removePhoto": "Supprimer la photo {n}"
+  },
+  "pwa": {
+    "title": "Installer PantryLens sur votre appareil",
+    "ios": "Appuyez sur le bouton Partager ↑ puis sur « Ajouter à l'écran d'accueil » pour un accès rapide.",
+    "android": "Appuyez sur le menu du navigateur (⋮) puis sur « Ajouter à l'écran d'accueil » pour un accès rapide.",
+    "dismiss": "Fermer la bannière d'installation"
+  },
+  "recipe": {
+    "analyzing": "Analyse de vos ingrédients..."
+  },
+  "home": {
+    "howItWorks": "Comment fonctionne PantryLens",
+    "step": "ÉTAPE",
+    "step1Title": "Prenez une photo",
+    "step1Desc": "Prenez jusqu'à 3 photos de votre réfrigérateur, congélateur ou garde-manger.",
+    "step2Title": "L'IA analyse",
+    "step2Desc": "Notre IA identifie chaque ingrédient visible dans vos photos.",
+    "step3Title": "Obtenez une recette",
+    "step3Desc": "Recevez une recette complète utilisant uniquement ce que vous avez.",
+    "whyTitle": "Pourquoi utiliser PantryLens ?",
+    "why1": "Réduisez le gaspillage alimentaire — cuisinez avant que ça expire",
+    "why2": "Résultats instantanés — la recette s'affiche en temps réel",
+    "why3": "Entièrement gratuit — sans compte, sans abonnement, sans limites cachées",
+    "why4": "Fonctionne sur tous les appareils — installable en PWA sur iOS et Android",
+    "why5": "Propulsé par Gemma 4 — le dernier modèle IA de vision de Google",
+    "perfectFor": "Parfait pour...",
+    "use1Title": "Vider le frigo",
+    "use1Desc": "Avant les courses ou un voyage, cuisinez ce qui reste",
+    "use2Title": "Utiliser les restes",
+    "use2Desc": "Transformez des restes aléatoires en quelque chose de délicieux",
+    "use3Title": "Cuisiner avec le garde-manger",
+    "use3Desc": "Découvrez des recettes à partir de conserves et de produits secs",
+    "use4Title": "Dîners rapides en semaine",
+    "use4Desc": "Pas d'idées ? Photographiez et cuisinez.",
+    "faqTitle": "Questions fréquentes",
+    "faq1Q": "Quels ingrédients PantryLens peut-il reconnaître ?",
+    "faq1A": "PantryLens peut identifier la plupart des fruits, légumes, protéines, produits laitiers, condiments et aliments de base visibles dans vos photos. Des photos claires et bien éclairées donnent les meilleurs résultats.",
+    "faq2Q": "Combien de photos puis-je télécharger à la fois ?",
+    "faq2A": "Vous pouvez télécharger jusqu'à 3 photos par requête — par exemple, une de votre réfrigérateur, une de votre congélateur et une de vos étagères.",
+    "faq3Q": "PantryLens fonctionne-t-il sur mobile ?",
+    "faq3A": "Oui. PantryLens est une Progressive Web App (PWA). Utilisez-la dans n'importe quel navigateur mobile ou installez-la sur votre écran d'accueil pour une expérience similaire à une application native sur iOS et Android.",
+    "faq4Q": "PantryLens est-il gratuit ?",
+    "faq4A": "Oui — PantryLens est entièrement gratuit, sans compte, abonnement ni frais cachés.",
+    "faq5Q": "Puis-je l'utiliser avec des ingrédients inhabituels ou en petite quantité ?",
+    "faq5A": "Absolument. PantryLens est conçu pour travailler de manière créative avec tout ce que vous avez — même des combinaisons rares ou inhabituelles. Il suggérera toujours la recette la plus pratique possible.",
+    "faq6Q": "PantryLens stocke-t-il mes photos ?",
+    "faq6A": "Non. Les photos sont compressées localement sur votre appareil et envoyées directement à l'IA pour analyse. Ni vos photos ni les recettes générées ne sont stockées par PantryLens.",
+    "footerTagline": "PantryLens — Générateur de recettes IA depuis des photos de réfrigérateur",
+    "footerSub": "Gratuit · Sans compte · Fonctionne sur tous les appareils",
+    "footerHackathon": "Créé pour le Hackathon Google Gemma 4 sur DEV",
+    "footerCopyright": "© 2026 Kuo-Hsiu (Kourtney) Lee. Tous droits réservés."
+  }
+}

@@ -5,9 +5,13 @@ import ImageCapture from './ImageCapture';
 import ImagePreview from './ImagePreview';
 import RecipeStream from './RecipeStream';
 import PWABanner from './PWABanner';
+import LocaleToggle from './LocaleToggle';
 import { compressToBase64 } from '@/lib/canvasCompress';
+import { useLocale } from '@/lib/i18n';
+import { trackEvent } from '@/lib/gtag';
 
 export default function PantryLensApp() {
+  const { t, locale } = useLocale();
   const [images, setImages] = useState<string[]>([]);
   const [recipe, setRecipe] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,10 +39,15 @@ export default function PantryLensApp() {
     }
 
     if (newImages.length) {
-      setImages((prev) => [...prev, ...newImages]);
+      setImages((prev) => {
+        const next = [...prev, ...newImages];
+        trackEvent({ name: 'image_added', params: { count: next.length } });
+        return next;
+      });
       setError('');
     } else if (anyFailed) {
-      setError('Could not process that photo. Try a different image or format.');
+      setError(t.app.errPhoto);
+      trackEvent({ name: 'recipe_error', params: { error_type: 'photo' } });
     }
   };
 
@@ -61,15 +70,17 @@ export default function PantryLensApp() {
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        body: JSON.stringify({ images }),
+        body: JSON.stringify({ images, locale }),
         headers: { 'Content-Type': 'application/json' },
       });
 
       if (res.status === 429) {
-        throw new Error("You've reached the hourly limit (5 requests/hour). Please try again later.");
+        trackEvent({ name: 'recipe_error', params: { error_type: 'rate_limit' } });
+        throw new Error(t.app.errRateLimit);
       }
       if (!res.ok) {
-        throw new Error('Failed to generate recipe. Please try again.');
+        trackEvent({ name: 'recipe_error', params: { error_type: 'upstream' } });
+        throw new Error(t.app.errFailed);
       }
 
       const reader = res.body!.getReader();
@@ -95,8 +106,13 @@ export default function PantryLensApp() {
           }
         }
       }
+
+      if (output) trackEvent({ name: 'recipe_generated', params: { locale } });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setError(err instanceof Error ? err.message : t.app.errGeneric);
+      if (!(err instanceof Error) || err.message === t.app.errGeneric) {
+        trackEvent({ name: 'recipe_error', params: { error_type: 'generic' } });
+      }
     } finally {
       setLoading(false);
     }
@@ -104,6 +120,7 @@ export default function PantryLensApp() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 pb-16">
+      <LocaleToggle />
       <PWABanner />
       <header className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-2xl mb-4">
@@ -115,7 +132,7 @@ export default function PantryLensApp() {
         >
           PantryLens
         </h1>
-        <p className="text-stone-500 text-lg">Snap your fridge. Get a recipe.</p>
+        <p className="text-stone-500 text-lg">{t.app.tagline}</p>
       </header>
 
       <div className="bg-white rounded-2xl shadow-md p-6 mb-4">
@@ -128,7 +145,7 @@ export default function PantryLensApp() {
                 onClick={reset}
                 className="mt-3 text-sm text-stone-400 hover:text-red-400 transition-colors"
               >
-                Clear all
+                {t.app.clearAll}
               </button>
             )}
           </div>
@@ -145,10 +162,10 @@ export default function PantryLensApp() {
         {loading ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Cooking up your recipe...
+            {t.app.generating}
           </span>
         ) : (
-          '✨ Generate Recipe'
+          t.app.generateBtn
         )}
       </button>
 

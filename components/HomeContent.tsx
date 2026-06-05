@@ -1,4 +1,11 @@
+'use client';
+
+import { useLocale } from '@/lib/i18n';
+
 export default function HomeContent() {
+  const { t } = useLocale();
+  const h = t.home;
+
   return (
     <div className="max-w-2xl mx-auto px-4 pb-16">
       {/* How It Works */}
@@ -8,17 +15,17 @@ export default function HomeContent() {
           className="text-2xl font-bold text-amber-800 mb-6"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
-          How PantryLens Works
+          {h.howItWorks}
         </h2>
         <div className="grid grid-cols-3 gap-4">
           {[
-            { step: '1', icon: '📷', title: 'Snap a Photo', desc: 'Take up to 3 photos of your fridge, freezer, or pantry.' },
-            { step: '2', icon: '🔍', title: 'AI Scans It', desc: 'Our AI identifies every visible ingredient in your photos.' },
-            { step: '3', icon: '🍽️', title: 'Get a Recipe', desc: 'Receive a complete recipe using only what you have.' },
+            { step: '1', icon: '📷', title: h.step1Title, desc: h.step1Desc },
+            { step: '2', icon: '🔍', title: h.step2Title, desc: h.step2Desc },
+            { step: '3', icon: '🍽️', title: h.step3Title, desc: h.step3Desc },
           ].map(({ step, icon, title, desc }) => (
             <div key={step} className="bg-white rounded-2xl p-4 shadow-sm text-center">
               <div className="text-3xl mb-2">{icon}</div>
-              <div className="text-xs font-bold text-amber-600 mb-1">STEP {step}</div>
+              <div className="text-xs font-bold text-amber-600 mb-1">{h.step} {step}</div>
               <h3 className="font-semibold text-stone-800 mb-1 text-sm">{title}</h3>
               <p className="text-stone-500 text-xs">{desc}</p>
             </div>
@@ -33,15 +40,15 @@ export default function HomeContent() {
           className="text-2xl font-bold text-amber-800 mb-4"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
-          Why Use PantryLens?
+          {h.whyTitle}
         </h2>
         <ul className="space-y-3" role="list">
           {[
-            { icon: '♻️', text: 'Reduce food waste — cook what you have before it expires' },
-            { icon: '⚡', text: 'Instant results — recipe streams to you in seconds, token by token' },
-            { icon: '🆓', text: 'Completely free — no account, no subscription, no hidden limits' },
-            { icon: '📱', text: 'Works on any device — installable as a PWA on iOS and Android' },
-            { icon: '🤖', text: "Powered by Gemma 4 — Google's latest vision AI model" },
+            { icon: '♻️', text: h.why1 },
+            { icon: '⚡', text: h.why2 },
+            { icon: '🆓', text: h.why3 },
+            { icon: '📱', text: h.why4 },
+            { icon: '🤖', text: h.why5 },
           ].map(({ icon, text }) => (
             <li key={text} className="flex items-start gap-3 bg-white rounded-xl p-3 shadow-sm">
               <span className="text-xl flex-shrink-0" aria-hidden="true">{icon}</span>
@@ -58,14 +65,14 @@ export default function HomeContent() {
           className="text-2xl font-bold text-amber-800 mb-4"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
-          Perfect For...
+          {h.perfectFor}
         </h2>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { icon: '🧹', title: 'Fridge Clean-Out', desc: "Before grocery shopping or a trip, cook what's left" },
-            { icon: '🍝', title: 'Using Leftovers', desc: 'Turn random leftovers into something delicious' },
-            { icon: '🛒', title: 'Pantry Cooking', desc: 'Discover recipes from canned goods and dry staples' },
-            { icon: '🌮', title: 'Quick Weeknights', desc: 'No recipe ideas? Just snap and cook.' },
+            { icon: '🧹', title: h.use1Title, desc: h.use1Desc },
+            { icon: '🍝', title: h.use2Title, desc: h.use2Desc },
+            { icon: '🛒', title: h.use3Title, desc: h.use3Desc },
+            { icon: '🌮', title: h.use4Title, desc: h.use4Desc },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="bg-white rounded-xl p-4 shadow-sm">
               <div className="text-2xl mb-1" aria-hidden="true">{icon}</div>
@@ -83,34 +90,16 @@ export default function HomeContent() {
           className="text-2xl font-bold text-amber-800 mb-4"
           style={{ fontFamily: 'var(--font-playfair)' }}
         >
-          Frequently Asked Questions
+          {h.faqTitle}
         </h2>
         <div className="space-y-2">
           {[
-            {
-              q: 'What ingredients can PantryLens recognize?',
-              a: 'PantryLens can identify most common fruits, vegetables, proteins, dairy products, condiments, and pantry staples visible in your photo. Clear, well-lit photos give the best results.',
-            },
-            {
-              q: 'How many photos can I upload at once?',
-              a: 'You can upload up to 3 photos per request — for example, one of your fridge, one of your freezer, and one of your pantry shelves.',
-            },
-            {
-              q: 'Does PantryLens work on mobile?',
-              a: 'Yes. PantryLens is a Progressive Web App (PWA). Use it in any mobile browser or install it to your home screen for a native app experience on both iOS and Android.',
-            },
-            {
-              q: 'Is PantryLens free to use?',
-              a: 'Yes — PantryLens is completely free with no account, subscription, or hidden fees required.',
-            },
-            {
-              q: 'Can I use PantryLens with unusual or limited ingredients?',
-              a: 'Absolutely. PantryLens is designed to work creatively with whatever you have — even sparse or unusual combinations. It will always suggest the most practical recipe possible.',
-            },
-            {
-              q: 'Does PantryLens store my photos?',
-              a: 'No. Photos are compressed locally on your device and sent directly to the AI for analysis. Neither your photos nor the generated recipes are stored by PantryLens.',
-            },
+            { q: h.faq1Q, a: h.faq1A },
+            { q: h.faq2Q, a: h.faq2A },
+            { q: h.faq3Q, a: h.faq3A },
+            { q: h.faq4Q, a: h.faq4A },
+            { q: h.faq5Q, a: h.faq5A },
+            { q: h.faq6Q, a: h.faq6A },
           ].map(({ q, a }) => (
             <details key={q} className="bg-white rounded-xl p-4 shadow-sm group">
               <summary className="font-medium text-stone-800 cursor-pointer text-sm flex justify-between items-center list-none">
@@ -126,8 +115,8 @@ export default function HomeContent() {
       </section>
 
       <footer className="mt-12 text-center text-stone-400 text-xs pb-4 space-y-3">
-        <p className="font-medium">PantryLens — AI Recipe Generator from Fridge Photos</p>
-        <p>Free to use · No account required · Works on any device</p>
+        <p className="font-medium">{h.footerTagline}</p>
+        <p>{h.footerSub}</p>
 
         {/* Hackathon badge */}
         <div>
@@ -138,7 +127,7 @@ export default function HomeContent() {
             className="inline-flex items-center gap-2 bg-white border border-stone-200 rounded-full px-3 py-1.5 text-xs text-stone-600 hover:border-amber-300 hover:text-amber-700 transition-colors shadow-sm"
           >
             <span aria-hidden="true">🏆</span>
-            Built for the Google Gemma 4 Hackathon on DEV
+            {h.footerHackathon}
           </a>
         </div>
 
@@ -155,7 +144,7 @@ export default function HomeContent() {
           </a>
         </div>
 
-        <p className="pt-1">© 2026 Kuo-Hsiu (Kourtney) Lee. All rights reserved.</p>
+        <p className="pt-1">{h.footerCopyright}</p>
       </footer>
     </div>
   );
