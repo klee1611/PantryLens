@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const securityHeaders = [
   // Prevent MIME-type sniffing attacks
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -23,11 +25,9 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      // Next.js App Router injects inline <script> tags for RSC hydration payloads.
-    // 'unsafe-inline' is required or those scripts are blocked and React cannot hydrate.
-    // 'unsafe-eval' is required by Next.js dev-mode HMR source maps.
-    // Production hardening: replace both with per-request nonces via Next.js middleware.
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // 'unsafe-inline' is required by Next.js App Router RSC hydration scripts.
+      // 'unsafe-eval' is only needed for dev-mode HMR source maps — excluded in production.
+      isProd ? "script-src 'self' 'unsafe-inline'" : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",       // blob: for Canvas-compressed previews
       "font-src 'self'",

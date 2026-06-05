@@ -1,0 +1,74 @@
+{
+  "app": {
+    "tagline": "拍下你的冰箱。立刻獲得食譜。",
+    "clearAll": "全部清除",
+    "generating": "正在為您生成食譜...",
+    "generateBtn": "✨ 生成食譜",
+    "errRateLimit": "您已達到每小時使用上限（5次／小時），請稍後再試。",
+    "errFailed": "食譜生成失敗，請再試一次。",
+    "errPhoto": "無法處理該照片，請嘗試其他圖片或格式。",
+    "errGeneric": "發生錯誤，請再試一次。"
+  },
+  "capture": {
+    "dropHere": "將照片拖放至此",
+    "orButtons": "或使用下方按鈕",
+    "camera": "📷 相機",
+    "upload": "📁 上傳",
+    "maxReached": "最多可上傳 3 張圖片"
+  },
+  "preview": {
+    "altText": "食材照片 {n}",
+    "removePhoto": "移除照片 {n}"
+  },
+  "pwa": {
+    "title": "將 PantryLens 安裝至您的裝置",
+    "ios": "點擊「分享」按鈕 ↑，然後選擇「加入主畫面」以快速存取。",
+    "android": "點擊瀏覽器選單 (⋮)，然後選擇「新增至主畫面」以快速存取。",
+    "dismiss": "關閉安裝提示"
+  },
+  "recipe": {
+    "analyzing": "正在分析您的食材..."
+  },
+  "home": {
+    "howItWorks": "PantryLens 如何運作",
+    "step": "步驟",
+    "step1Title": "拍張照片",
+    "step1Desc": "拍下最多 3 張冰箱、冷凍庫或食品儲藏室的照片。",
+    "step2Title": "AI 掃描辨識",
+    "step2Desc": "我們的 AI 辨識照片中所有可見的食材。",
+    "step3Title": "獲得食譜",
+    "step3Desc": "接收一份只使用您現有食材的完整食譜。",
+    "whyTitle": "為什麼選擇 PantryLens？",
+    "why1": "減少食物浪費——在食材過期前烹調它們",
+    "why2": "即時結果——食譜逐字串流到您面前",
+    "why3": "完全免費——無需帳號、訂閱，沒有隱藏限制",
+    "why4": "支援任何裝置——可在 iOS 和 Android 上作為 PWA 安裝",
+    "why5": "由 Gemma 4 驅動——Google 最新的視覺 AI 模型",
+    "perfectFor": "最適合...",
+    "use1Title": "清冰箱",
+    "use1Desc": "購物或出行前，先把剩餘食材煮掉",
+    "use2Title": "活用剩食",
+    "use2Desc": "把隨機的剩菜變成美味料理",
+    "use3Title": "食品儲藏室料理",
+    "use3Desc": "從罐頭食品和乾貨中發掘食譜",
+    "use4Title": "快速平日晚餐",
+    "use4Desc": "沒有靈感？拍照後就開始做吧。",
+    "faqTitle": "常見問題",
+    "faq1Q": "PantryLens 能辨識哪些食材？",
+    "faq1A": "PantryLens 能辨識大多數常見的蔬果、蛋白質食品、乳製品、調味料及食品儲藏室中的主食，清晰、光線充足的照片效果最佳。",
+    "faq2Q": "一次可以上傳幾張照片？",
+    "faq2A": "每次可上傳最多 3 張照片——例如冰箱、冷凍庫和食品儲藏室各一張。",
+    "faq3Q": "PantryLens 支援手機使用嗎？",
+    "faq3A": "是的。PantryLens 是一款漸進式網頁應用程式（PWA）。可在任何手機瀏覽器中使用，或安裝到主畫面，享受類似原生應用程式的體驗，iOS 和 Android 皆支援。",
+    "faq4Q": "PantryLens 是免費的嗎？",
+    "faq4A": "是的——PantryLens 完全免費，無需帳號、訂閱或任何隱藏費用。",
+    "faq5Q": "食材不常見或數量很少也能使用嗎？",
+    "faq5A": "當然可以。PantryLens 專為各種食材組合而設計，即使食材稀少或不尋常，也能創意發揮，推薦最實用的食譜。",
+    "faq6Q": "PantryLens 會儲存我的照片嗎？",
+    "faq6A": "不會。照片會在您的裝置上進行本地壓縮，然後直接傳送給 AI 進行分析，PantryLens 不會儲存您的照片或生成的食譜。",
+    "footerTagline": "PantryLens——從冰箱照片生成 AI 食譜",
+    "footerSub": "免費使用 · 無需帳號 · 支援任何裝置",
+    "footerHackathon": "為 DEV 平台 Google Gemma 4 黑客松而建",
+    "footerCopyright": "© 2026 李郭秀（Kourtney）版權所有。"
+  }
+}

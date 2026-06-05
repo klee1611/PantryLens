@@ -1,0 +1,74 @@
+{
+  "app": {
+    "tagline": "Snap your fridge. Get a recipe.",
+    "clearAll": "Clear all",
+    "generating": "Cooking up your recipe...",
+    "generateBtn": "✨ Generate Recipe",
+    "errRateLimit": "You've reached the hourly limit (5 requests/hour). Please try again later.",
+    "errFailed": "Failed to generate recipe. Please try again.",
+    "errPhoto": "Could not process that photo. Try a different image or format.",
+    "errGeneric": "Something went wrong. Please try again."
+  },
+  "capture": {
+    "dropHere": "Drop photos here",
+    "orButtons": "or use the buttons below",
+    "camera": "📷 Camera",
+    "upload": "📁 Upload",
+    "maxReached": "Maximum 3 images added"
+  },
+  "preview": {
+    "altText": "Ingredient photo {n}",
+    "removePhoto": "Remove photo {n}"
+  },
+  "pwa": {
+    "title": "Install PantryLens on your device",
+    "ios": "Tap the Share button ↑ then \"Add to Home Screen\" for quick access.",
+    "android": "Tap the browser menu (⋮) then \"Add to Home screen\" for quick access.",
+    "dismiss": "Dismiss install banner"
+  },
+  "recipe": {
+    "analyzing": "Analyzing your ingredients..."
+  },
+  "home": {
+    "howItWorks": "How PantryLens Works",
+    "step": "STEP",
+    "step1Title": "Snap a Photo",
+    "step1Desc": "Take up to 3 photos of your fridge, freezer, or pantry.",
+    "step2Title": "AI Scans It",
+    "step2Desc": "Our AI identifies every visible ingredient in your photos.",
+    "step3Title": "Get a Recipe",
+    "step3Desc": "Receive a complete recipe using only what you have.",
+    "whyTitle": "Why Use PantryLens?",
+    "why1": "Reduce food waste — cook what you have before it expires",
+    "why2": "Instant results — recipe streams to you in seconds, token by token",
+    "why3": "Completely free — no account, no subscription, no hidden limits",
+    "why4": "Works on any device — installable as a PWA on iOS and Android",
+    "why5": "Powered by Gemma 4 — Google's latest vision AI model",
+    "perfectFor": "Perfect For...",
+    "use1Title": "Fridge Clean-Out",
+    "use1Desc": "Before grocery shopping or a trip, cook what's left",
+    "use2Title": "Using Leftovers",
+    "use2Desc": "Turn random leftovers into something delicious",
+    "use3Title": "Pantry Cooking",
+    "use3Desc": "Discover recipes from canned goods and dry staples",
+    "use4Title": "Quick Weeknights",
+    "use4Desc": "No recipe ideas? Just snap and cook.",
+    "faqTitle": "Frequently Asked Questions",
+    "faq1Q": "What ingredients can PantryLens recognize?",
+    "faq1A": "PantryLens can identify most common fruits, vegetables, proteins, dairy products, condiments, and pantry staples visible in your photo. Clear, well-lit photos give the best results.",
+    "faq2Q": "How many photos can I upload at once?",
+    "faq2A": "You can upload up to 3 photos per request — for example, one of your fridge, one of your freezer, and one of your pantry shelves.",
+    "faq3Q": "Does PantryLens work on mobile?",
+    "faq3A": "Yes. PantryLens is a Progressive Web App (PWA). Use it in any mobile browser or install it to your home screen for a native app experience on both iOS and Android.",
+    "faq4Q": "Is PantryLens free to use?",
+    "faq4A": "Yes — PantryLens is completely free with no account, subscription, or hidden fees required.",
+    "faq5Q": "Can I use PantryLens with unusual or limited ingredients?",
+    "faq5A": "Absolutely. PantryLens is designed to work creatively with whatever you have — even sparse or unusual combinations. It will always suggest the most practical recipe possible.",
+    "faq6Q": "Does PantryLens store my photos?",
+    "faq6A": "No. Photos are compressed locally on your device and sent directly to the AI for analysis. Neither your photos nor the generated recipes are stored by PantryLens.",
+    "footerTagline": "PantryLens — AI Recipe Generator from Fridge Photos",
+    "footerSub": "Free to use · No account required · Works on any device",
+    "footerHackathon": "Built for the Google Gemma 4 Hackathon on DEV",
+    "footerCopyright": "© 2026 Kuo-Hsiu (Kourtney) Lee. All rights reserved."
+  }
+}

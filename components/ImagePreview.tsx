@@ -1,11 +1,15 @@
 'use client';
 
+import { useLocale, interpolate } from '@/lib/i18n';
+
 interface Props {
   images: string[];
   onRemove: (idx: number) => void;
 }
 
 export default function ImagePreview({ images, onRemove }: Props) {
+  const { t } = useLocale();
+
   return (
     <div className="flex gap-3 flex-wrap">
       {images.map((b64, i) => (
@@ -13,12 +17,12 @@ export default function ImagePreview({ images, onRemove }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element -- data: URLs are not supported by next/image */}
           <img
             src={`data:image/jpeg;base64,${b64}`}
-            alt={`Ingredient photo ${i + 1}`}
+            alt={interpolate(t.preview.altText, { n: i + 1 })}
             className="w-20 h-20 object-cover rounded-xl border-2 border-amber-100 shadow-sm"
           />
           <button
             onClick={() => onRemove(i)}
-            aria-label={`Remove photo ${i + 1}`}
+            aria-label={interpolate(t.preview.removePhoto, { n: i + 1 })}
             className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-600
                        text-white rounded-full text-xs font-bold flex items-center justify-center
                        shadow-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"

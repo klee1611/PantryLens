@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale } from '@/lib/i18n';
 
 export default function PWABanner() {
+  const { t } = useLocale();
   const [visible, setVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
@@ -24,11 +26,9 @@ export default function PWABanner() {
     >
       <span className="text-xl flex-shrink-0 mt-0.5" aria-hidden="true">📲</span>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-amber-800 leading-snug">Install PantryLens on your device</p>
+        <p className="font-semibold text-amber-800 leading-snug">{t.pwa.title}</p>
         <p className="text-amber-700 mt-0.5 leading-snug">
-          {isIOS
-            ? 'Tap the Share button ↑ then "Add to Home Screen" for quick access.'
-            : 'Tap the browser menu (⋮) then "Add to Home screen" for quick access.'}
+          {isIOS ? t.pwa.ios : t.pwa.android}
         </p>
       </div>
       <button
@@ -36,7 +36,7 @@ export default function PWABanner() {
           localStorage.setItem('pwa-banner-dismissed', '1');
           setVisible(false);
         }}
-        aria-label="Dismiss install banner"
+        aria-label={t.pwa.dismiss}
         className="flex-shrink-0 text-amber-400 hover:text-amber-600 transition-colors text-lg leading-none mt-0.5"
       >
         ✕

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from '@/lib/i18n';
 
 interface Props {
   onFiles: (files: File[]) => void;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function ImageCapture({ onFiles, disabled }: Props) {
+  const { t } = useLocale();
   const [isDragging, setIsDragging] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,8 +73,8 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
       >
         {fileInput({ multiple: true })}
         <div className="text-4xl mb-2">📸</div>
-        <p className="text-stone-500 font-medium">Drop photos here</p>
-        <p className="text-stone-400 text-sm mt-1">or use the buttons below</p>
+        <p className="text-stone-500 font-medium">{t.capture.dropHere}</p>
+        <p className="text-stone-400 text-sm mt-1">{t.capture.orButtons}</p>
       </label>
 
       <div className="flex gap-3 mt-3">
@@ -90,7 +92,7 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
         >
           {/* capture="environment" opens rear camera directly on iOS/Android */}
           {fileInput({ capture: 'environment' })}
-          📷 Camera
+          {t.capture.camera}
         </label>
 
         <label
@@ -106,12 +108,12 @@ export default function ImageCapture({ onFiles, disabled }: Props) {
           ].join(' ')}
         >
           {fileInput({ multiple: true })}
-          📁 Upload
+          {t.capture.upload}
         </label>
       </div>
 
       {disabled && (
-        <p className="text-center text-stone-400 text-xs mt-2">Maximum 3 images added</p>
+        <p className="text-center text-stone-400 text-xs mt-2">{t.capture.maxReached}</p>
       )}
     </div>
   );
