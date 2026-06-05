@@ -27,11 +27,13 @@ const securityHeaders = [
       "default-src 'self'",
       // 'unsafe-inline' is required by Next.js App Router RSC hydration scripts.
       // 'unsafe-eval' is only needed for dev-mode HMR source maps — excluded in production.
-      isProd ? "script-src 'self' 'unsafe-inline'" : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      isProd
+        ? "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com"
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",       // blob: for Canvas-compressed previews
+      "img-src 'self' data: blob: https://www.google-analytics.com",
       "font-src 'self'",
-      "connect-src 'self'",               // SSE to /api/analyze only
+      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
       "media-src 'none'",
       "object-src 'none'",
       "base-uri 'self'",

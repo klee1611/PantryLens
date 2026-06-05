@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLocale } from '@/lib/i18n';
+import { trackEvent } from '@/lib/gtag';
 
 export default function PWABanner() {
   const { t } = useLocale();
@@ -35,6 +36,7 @@ export default function PWABanner() {
         onClick={() => {
           localStorage.setItem('pwa-banner-dismissed', '1');
           setVisible(false);
+          trackEvent({ name: 'pwa_banner_dismissed' });
         }}
         aria-label={t.pwa.dismiss}
         className="flex-shrink-0 text-amber-400 hover:text-amber-600 transition-colors text-lg leading-none mt-0.5"

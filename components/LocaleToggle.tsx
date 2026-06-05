@@ -1,6 +1,7 @@
 'use client';
 
 import { LOCALES, LOCALE_LABELS, useLocale, type Locale } from '@/lib/i18n';
+import { trackEvent } from '@/lib/gtag';
 
 export default function LocaleToggle() {
   const { locale, setLocale } = useLocale();
@@ -14,7 +15,7 @@ export default function LocaleToggle() {
       {LOCALES.map((l: Locale) => (
         <button
           key={l}
-          onClick={() => setLocale(l)}
+          onClick={() => { setLocale(l); trackEvent({ name: 'locale_changed', params: { locale: l } }); }}
           aria-pressed={locale === l}
           className={[
             'px-2 py-0.5 rounded-full text-xs font-medium transition-colors',

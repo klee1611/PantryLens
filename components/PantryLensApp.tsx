@@ -8,6 +8,7 @@ import PWABanner from './PWABanner';
 import LocaleToggle from './LocaleToggle';
 import { compressToBase64 } from '@/lib/canvasCompress';
 import { useLocale } from '@/lib/i18n';
+import { trackEvent } from '@/lib/gtag';
 
 export default function PantryLensApp() {
   const { t, locale } = useLocale();
@@ -38,10 +39,15 @@ export default function PantryLensApp() {
     }
 
     if (newImages.length) {
-      setImages((prev) => [...prev, ...newImages]);
+      setImages((prev) => {
+        const next = [...prev, ...newImages];
+        trackEvent({ name: 'image_added', params: { count: next.length } });
+        return next;
+      });
       setError('');
     } else if (anyFailed) {
       setError(t.app.errPhoto);
+      trackEvent({ name: 'recipe_error', params: { error_type: 'photo' } });
     }
   };
 
@@ -69,9 +75,11 @@ export default function PantryLensApp() {
       });
 
       if (res.status === 429) {
+        trackEvent({ name: 'recipe_error', params: { error_type: 'rate_limit' } });
         throw new Error(t.app.errRateLimit);
       }
       if (!res.ok) {
+        trackEvent({ name: 'recipe_error', params: { error_type: 'upstream' } });
         throw new Error(t.app.errFailed);
       }
 
@@ -98,8 +106,13 @@ export default function PantryLensApp() {
           }
         }
       }
+
+      if (output) trackEvent({ name: 'recipe_generated', params: { locale } });
     } catch (err) {
       setError(err instanceof Error ? err.message : t.app.errGeneric);
+      if (!(err instanceof Error) || err.message === t.app.errGeneric) {
+        trackEvent({ name: 'recipe_error', params: { error_type: 'generic' } });
+      }
     } finally {
       setLoading(false);
     }
