@@ -195,13 +195,13 @@ describe('upstream error handling', () => {
     expect(res.status).toBe(429);
   });
 
-  it('forwards upstream 500 status', async () => {
+  it('returns 502 for upstream 500 errors', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce(
       new Response('Internal server error', { status: 500 })
     );
 
     const res = await POST(makeRequest({ images: ['base64'] }));
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(502);
   });
 });
 
